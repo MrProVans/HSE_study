@@ -3,13 +3,11 @@ public class ComplexMatrix {
     private int rows;
     private int cols;
 
-    // Конструктор для создания матрицы n x m
     public ComplexMatrix(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
         matrix = new ComplexNumber[rows][cols];
 
-        // Инициализируем матрицу нулями
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 matrix[i][j] = new ComplexNumber(0, 0);
@@ -17,17 +15,14 @@ public class ComplexMatrix {
         }
     }
 
-    // Метод для установки значения в ячейке матрицы
     public void setElement(int row, int col, ComplexNumber value) {
         matrix[row][col] = value;
     }
 
-    // Метод для получения значения из ячейки матрицы
     public ComplexNumber getElement(int row, int col) {
         return matrix[row][col];
     }
 
-    // Метод для отображения матрицы
     public void display() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -37,7 +32,6 @@ public class ComplexMatrix {
         }
     }
 
-    // Сложение двух матриц
     public ComplexMatrix add(ComplexMatrix other) {
         ComplexMatrix result = new ComplexMatrix(rows, cols);
         for (int i = 0; i < rows; i++) {
@@ -48,7 +42,6 @@ public class ComplexMatrix {
         return result;
     }
 
-    // Вычитание двух матриц
     public ComplexMatrix subtract(ComplexMatrix other) {
         ComplexMatrix result = new ComplexMatrix(rows, cols);
         for (int i = 0; i < rows; i++) {
@@ -59,7 +52,6 @@ public class ComplexMatrix {
         return result;
     }
 
-    // Умножение матриц
     public ComplexMatrix multiply(ComplexMatrix other) {
         ComplexMatrix result = new ComplexMatrix(this.rows, other.cols);
         for (int i = 0; i < this.rows; i++) {
@@ -74,7 +66,6 @@ public class ComplexMatrix {
         return result;
     }
 
-    // Транспонирование матрицы
     public ComplexMatrix transpose() {
         ComplexMatrix result = new ComplexMatrix(cols, rows);
         for (int i = 0; i < rows; i++) {
@@ -85,7 +76,6 @@ public class ComplexMatrix {
         return result;
     }
 
-    // Вычисление детерминанта (работает для матриц 2x2 и 3x3)
     public ComplexNumber determinant() {
         if (rows == 2 && cols == 2) {
             ComplexNumber a = getElement(0, 0);
@@ -111,7 +101,6 @@ public class ComplexMatrix {
         throw new UnsupportedOperationException("Детерминант поддерживается только для матриц 2x2 и 3x3");
     }
 
-    // Метод для нахождения обратной матрицы (работает только для матриц 2x2)
     public ComplexMatrix inverse() {
         ComplexNumber det = determinant();
         if (det.getReal() == 0 && det.getImaginary() == 0) {
@@ -132,7 +121,6 @@ public class ComplexMatrix {
         return inverseMatrix;
     }
 
-    // Метод деления двух матриц
     public ComplexMatrix divide(ComplexMatrix other) {
         ComplexMatrix inverseOther = other.inverse();
         return this.multiply(inverseOther);
