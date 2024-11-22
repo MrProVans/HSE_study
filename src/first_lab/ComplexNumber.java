@@ -1,3 +1,5 @@
+package first_lab;
+
 public class ComplexNumber {
     private double real;
     private double imaginary;

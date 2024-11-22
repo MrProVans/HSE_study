@@ -1,3 +1,5 @@
+package first_lab;
+
 public class ComplexNumberDemo {
     public static void main(String[] args) {
         ComplexNumber num1 = new ComplexNumber(3, 4); // 3 + 4i

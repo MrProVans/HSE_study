@@ -1,3 +1,5 @@
+package first_lab;
+
 public class ComplexMatrix {
     private ComplexNumber[][] matrix;
     private int rows;

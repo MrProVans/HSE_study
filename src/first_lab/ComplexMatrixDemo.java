@@ -1,3 +1,5 @@
+package first_lab;
+
 public class ComplexMatrixDemo {
     public static void main(String[] args) {
         ComplexMatrix matrix1 = new ComplexMatrix(2, 2);
