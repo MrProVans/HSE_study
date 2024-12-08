@@ -1,41 +1,90 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.net.URISyntaxException;
-import java.util.Scanner;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("Привет! У меня есть данные из двух файлов:");
-            System.out.println("1. companies.json — информация о компаниях.");
-            System.out.println("2. blogs.json — информация о блогах.");
-            System.out.println("Я могу показать данные для следующих полей.");
-            System.out.println("Для компаний: id, name, address, zip, country, employeeCount, industry, marketCap, domain, logo, ceoName.");
-            System.out.println("Для блогов: userId, id, title, body, link, comment_count.");
-            System.out.println("Введите названия полей, которые хотите увидеть, через запятую (например: name, address):");
+            // Пользователь вводит ссылку на API
+            System.out.println("Введите ссылку на API:");
+            String apiUrl = scanner.nextLine();
 
+            // Получение данных из API
+            String apiResponse = fetchDataFromApi(apiUrl);
+
+            if (apiResponse.isEmpty()) {
+                System.err.println("Не удалось получить данные из API.");
+                return;
+            }
+
+            // Определяем доступные поля
+            Set<String> availableFields = determineFields(apiResponse);
+            if (availableFields.isEmpty()) {
+                System.err.println("Не удалось определить поля в JSON данных.");
+                return;
+            }
+
+            // Показываем доступные поля пользователю
+            System.out.println("Доступные поля в JSON данных:");
+            System.out.println(String.join(", ", availableFields));
+            System.out.println("Введите названия полей, которые хотите увидеть, через запятую:");
+
+            // Получаем от пользователя список полей для вывода
             String[] selectedFields = scanner.nextLine().toLowerCase().split(",\\s*");
 
-            System.out.println("Теперь выводим данные из companies.json...");
-            String companiesContent = readResourceFile("companies.json");
-            parseAndDisplayFilteredData(companiesContent, selectedFields);
-
-            System.out.println("\nТеперь выводим данные из blogs.json...");
-            String blogsContent = readResourceFile("blogs.json");
-            parseAndDisplayFilteredData(blogsContent, selectedFields);
-
-        } catch (IOException | URISyntaxException e) {
-            System.err.println("Ошибка чтения файла: " + e.getMessage());
+            // Выводим выбранные данные
+            System.out.println("\nВывод данных из API:");
+            parseAndDisplayFilteredData(apiResponse, selectedFields);
+        } catch (Exception e) {
+            System.err.println("Произошла ошибка: " + e.getMessage());
         }
     }
 
-    private static String readResourceFile(String fileName) throws IOException, URISyntaxException {
-        Path path = Paths.get(Main.class.getClassLoader().getResource(fileName).toURI());
-        return Files.readString(path);
+    // Метод получения данных из API
+    private static String fetchDataFromApi(String apiUrl) {
+        StringBuilder result = new StringBuilder();
+        try {
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Ошибка получения данных из API: " + e.getMessage());
+        }
+        return result.toString();
     }
 
+    // Метод определения доступных полей
+    private static Set<String> determineFields(String json) {
+        Set<String> fields = new HashSet<>();
+        // Извлекаем первую запись для анализа
+        String[] entries = json.replace("[", "").replace("]", "").split("\\},\\s*\\{");
+        if (entries.length > 0) {
+            String firstEntry = entries[0]
+                    .replace("{", "")
+                    .replace("}", "")
+                    .replace("\"", "");
+            String[] keyValuePairs = firstEntry.split(",\\s*");
+            for (String pair : keyValuePairs) {
+                String[] keyValue = pair.split(":\\s*", 2);
+                if (keyValue.length == 2) {
+                    fields.add(keyValue[0].trim());
+                }
+            }
+        }
+        return fields;
+    }
+
+    // Парсинг и вывод данных по выбранным полям
     private static void parseAndDisplayFilteredData(String json, String[] selectedFields) {
         String[] entries = json.replace("[", "").replace("]", "").split("\\},\\s*\\{");
 
@@ -58,7 +107,7 @@ public class Main {
                     }
                 }
             }
-            System.out.println();
+            System.out.println(); // Пустая строка между записями
         }
     }
 }
